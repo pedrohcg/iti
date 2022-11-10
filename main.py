@@ -55,9 +55,9 @@ if __name__ == '__main__':
         else:
             result = decode_file(args['input_file'])
          
-            print(result)
-            #with open(f'./outputs/descompress_result.txt', 'w') as f_output:
-                #f_output.write(result)
+            #print(result)
+            with open(f'./outputs/descompress_result.txt', 'w', encoding='latin-1') as f_output:
+                f_output.write(result)
 
 
     
