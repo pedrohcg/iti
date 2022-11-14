@@ -3,48 +3,14 @@ from tqdm import tqdm
 
 encoding = 'latin-1'
 
-def open_file(file):
-    with open(file, 'rb') as f:
-        compressed_data = []
-
-        while True:
-            rec = f.read(2)
-            if len(rec) != 4:
-                break
-            (data, ) = struct.unpack('>H', rec)
-            compressed_data.append(data)
-        
-        return compressed_data
-
-def write_file(decompressed_data):
-    with open(f'./outputs/result.txt', 'wb') as result:
-        for data in decompressed_data:
-            result.write(data)
+def write_file(decompressed_data, fileName):
+    with open(f'./outputs/decompressed_{fileName[:-4]}', 'w', encoding=encoding) as f_output:
+        f_output.write(decompressed_data)
 
 
 def decode_file(file):
-    #compressed_data = open_file(file)
 
-    #concatenated_words = ""
-    #decompressed_data = []
-    #dictionary_size = 256
-    #dictionary = dict([(x, f'{x}'.encode(encoding)) for x in range(dictionary_size)])
-
-    #for code in tqdm(compressed_data, colour='#FFFFFF'):
-    #    if not code in dictionary:
-    #        dictionary[code] = (concatenated_words + concatenated_words[0]).encode(encoding)
-        
-    #    decompressed_data.append(dictionary[code])
-
-    #    if not(len(compressed_data) == 0):
-    #        dictionary[dictionary_size] = (concatenated_words + dictionary[code].decode(encoding)[0]).encode(encoding)
-    #        dictionary_size += 1
-
-    #    concatenated_words = dictionary[code].decode(encoding)
-
-    #    write_file(decompressed_data)
-
-    with open(file, 'rb') as f:
+    with open(f'./outputs/{file}', 'rb') as f:
         compressed_data = []
 
         while True:
@@ -66,8 +32,8 @@ def decode_file(file):
         descompressed_text.append(first_letter.decode('latin-1'))
 
         dictionary[index] = first_letter
-    
-        for i in range(1, len(compressed_data)):
+
+        for i in tqdm(range(1, len(compressed_data))):
             code = str(compressed_data[i])
             decoded_symbol = dictionary[code].decode('latin-1')
 
@@ -85,6 +51,6 @@ def decode_file(file):
             dictionary[index] = dictionary[code]
         
             descompressed_text.append(dictionary[code].decode('latin-1'))
-    
-        return "".join(descompressed_text)
+
+        write_file(''.join(descompressed_text), file)
 
