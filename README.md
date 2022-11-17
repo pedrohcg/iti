@@ -21,11 +21,11 @@ Este projeto aceita como formato para a compressão txt e mp4. No diretório rai
 - Compressão:
 
 ```
-python3 main.py -enc -k="[9-16]" -i="caminho_do_arquivo_para_comprimir"
+python3 main.py -enc -k="[9-16]" -i="nome_do_arquivo_para_comprimir"
 ```
 
 - Decompressão:
 
 ```
-python3 main.py -dec -i="caminho_do_arquivo_para_descomprimir"
+python3 main.py -dec -i="nome_do_arquivo_para_descomprimir"
 ```

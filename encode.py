@@ -47,6 +47,7 @@ def encode_file(k, file):
         compressed_data.append(dictionary[concatenated_words.encode(encoding)])
 
     end_time = timeit.default_timer()
+    print(f'{len(compressed_data) - 1} indices in LZW compression')
 
     print(f'Compression time: {end_time - begin_time} seconds')
     write_file(compressed_data, file)
