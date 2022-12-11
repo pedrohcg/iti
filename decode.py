@@ -3,54 +3,47 @@ from tqdm import tqdm
 
 encoding = 'latin-1'
 
-def write_file(decompressed_data, fileName):
-    with open(f'./outputs/decompressed_{fileName[:-4]}', 'w', encoding=encoding) as f_output:
-        f_output.write(decompressed_data)
+class decode_file():
 
+    def __init__(self, file_dir=str):
+        self.file_dir = file_dir
+        self.dictionary_size = 256
+        self.dictionary = dict([(x, x.to_bytes(1, 'big')) for x in range(self.dictionary_size)])
+        self.compressed_data = []
 
-def decode_file(file):
+    def open_file(self):
+        with open(f'./outputs/{self.file_dir}', 'rb') as f:
+            while True:
+                rec = f.read(2)
+                if len(rec) != 2:
+                    break
+                (data, ) = struct.unpack('>H', rec)
+                self.compressed_data.append(data)
 
-    with open(f'./outputs/{file}', 'rb') as f:
-        compressed_data = []
-
-        while True:
-            rec = f.read(2)
-            if len(rec) != 2:
-                break
-            (data, ) = struct.unpack('>H', rec)
-            compressed_data.append(data)
-    
-        if len(compressed_data) - 1 < 1:
-            print("Arquivo vazio")
-            return
-
-        #inicializar dicionário de decodificação
-        dictionary = {f'{i}': (i.to_bytes(1, 'big')) for i in range(256)}
-        descompressed_text, index = [], "256"
-
-        first_letter = dictionary[str(compressed_data[0])]
-        descompressed_text.append(first_letter.decode('latin-1'))
-
-        dictionary[index] = first_letter
-
-        for i in tqdm(range(1, len(compressed_data))):
-            code = str(compressed_data[i])
-            decoded_symbol = dictionary[code].decode('latin-1')
-
-            if len(decoded_symbol):
-                symbol = decoded_symbol[0]
-            else:
-                symbol = decoded_symbol
+    def write_file(self, decompressed_data=list):
+        name = self.file_dir.split('.bin')
+        with open(f'./outputs/decompressed_{name[0]}', 'wb') as f_output:
+            for data in decompressed_data:
+                f_output.write(data)
         
-            dictionary[index] = dictionary[index] + \
-                symbol.encode('latin-1')
+    def decode_file(self):
+
+        self.open_file()
+
+        symbol = ""
+        decompressed_data = []
+
+        for code in tqdm(self.compressed_data, colour='#FFFFFF'):
+            if code not in self.dictionary:
+                self.dictionary[code] = (symbol + symbol[0]).encode(encoding)
+            
+            decompressed_data.append(self.dictionary[code])
+
+            if(not(len(symbol) == 0)):
+                self.dictionary[self.dictionary_size] = (symbol + \
+                    self.dictionary[code].decode(encoding)[0]).encode(encoding)
+                self.dictionary_size += 1
+
+            symbol = self.dictionary[code].decode(encoding)
         
-
-            index = str(int(index) + 1)
-
-            dictionary[index] = dictionary[code]
-        
-            descompressed_text.append(dictionary[code].decode('latin-1'))
-
-        write_file(''.join(descompressed_text), file)
-
+        self.write_file(decompressed_data)
